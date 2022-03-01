@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('用户列表')"/>
+    <link rel="stylesheet" th:href="@{/admin/css/other/user.css}"/>
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form action="" class="layui-form" lay-filter="user-query-form">
+            <div class="layui-form-item">
+
+                <label class="layui-form-label">场所名称</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" name="placeName" placeholder="" type="text">
+                </div>
+                <button class="pear-btn pear-btn-md pear-btn-primary" lay-filter="place-query" lay-submit>
+                    <i class="layui-icon layui-icon-search"></i>
+                    查询
+                </button>
+                <button class="pear-btn pear-btn-md" type="reset">
+                    <i class="layui-icon layui-icon-refresh"></i>
+                    重置
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="user-main user-collasped">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <table id="place-table" lay-filter="place-table"></table>
+        </div>
+    </div>
+</div>
+</body>
+
+<script id="place-toolbar" type="text/html">
+    <button sec:authorize="hasPermission('/system/place/add','sys:place:add')"
+            class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+        <i class="pear-icon pear-icon-add"></i>
+        新增
+    </button>
+    <button sec:authorize="hasPermission('/system/place/remove','sys:place:remove')" class="pear-btn pear-btn-md"
+            lay-event="batchRemove">
+        <i class="pear-icon pear-icon-ashbin"></i>
+        删除
+    </button>
+
+</script>
+
+<script id="place-bar" type="text/html">
+    <button sec:authorize="hasPermission('/system/place/edit','sys:place:edit')"
+            class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="pear-icon pear-icon-edit"></i>
+    </button>
+    <button sec:authorize="hasPermission('/system/place/remove','sys:place:remove')"
+            class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="pear-icon pear-icon-ashbin"></i>
+    </button>
+    <button sec:authorize="hasPermission('/system/place/qrInfo','sys:place:qrInfo')"
+            class="pear-btn pear-btn-danger pear-btn-sm" lay-event="qrInfo"><i class="pear-icon pear-icon-attachment"></i>
+    </button>
+
+</script>
+
+<script id="place-createDate" type="text/html">
+    {{layui.util.toDateString(d.createDate,  'yyyy-MM-dd HH:mm:ss')}}
+</script>
+
+
+<th:block th:include="include :: footer"/>
+<script>
+    layui.use(['table', 'dtree', 'form', 'jquery', 'popup', 'common'], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+        let dtree = layui.dtree;
+        let popup = layui.popup;
+        let common = layui.common;
+
+        let MODULE_PATH = "/system/place/";
+
+        let cols = [
+            [
+                {type: 'checkbox'},
+                {title: '场馆名称', field: 'placeName', align: 'center'},
+                {title: '创建时间', field: 'createDate', align: 'center', templet: "#place-createDate"},
+                {title: '管理员姓名', field: 'realName', align: 'center'},
+                {title: '公告', field: 'notice', align: 'center'},
+                {title: '运动项目', field: 'sportProject', align: 'center'},
+                {title: '所属部门', field: 'deptName', align: 'center'},
+                {title: '打卡二维码路径', field: 'qrinfo', align: 'center', width: 250},
+                {title: '操作', toolbar: '#place-bar', align: 'center', width: 180}
+            ]
+        ]
+
+        table.render({
+            elem: '#place-table',
+            url: MODULE_PATH + 'data',
+            page: true,
+            cols: cols,
+            skin: 'line',
+            height: 'full-148',
+            toolbar: '#place-toolbar',
+            text: {none: '暂无场所信息'},
+            defaultToolbar: [{
+                layEvent: 'refresh',
+                icon: 'layui-icon-refresh',
+                title: "刷新"
+            }, 'filter', 'print', 'exports']
+        });
+
+
+
+        table.on('tool(place-table)', function (obj) {
+            if (obj.event === 'remove') {
+                window.remove(obj);
+            } else if (obj.event === 'edit') {
+                window.edit(obj);
+            }else if (obj.event === 'qrInfo') {
+                window.rqInfo(obj);
+            }
+        });
+
+        table.on('toolbar(place-table)', function (obj) {
+            if (obj.event === 'add') {
+                window.add();
+            } else if (obj.event === 'refresh') {
+                window.refresh();
+            } else if (obj.event === 'batchRemove') {
+                window.batchRemove(obj);
+            } else if (obj.event == 'collasped') {
+                $(".user-left").toggleClass("user-collasped");
+                $(".user-main").toggleClass("user-collasped");
+                table.resize();
+            }
+        });
+
+        form.on('submit(place-query)', function (data) {
+            window.refresh(data.field);
+            return false;
+        });
+
+
+
+        window.add = function () {
+            layer.open({
+                type: 2,
+                title: '新增',
+                shade: 0.1,
+                area: ['550px', '550px'],
+                content: MODULE_PATH + 'add'
+            });
+        }
+
+        window.edit = function (obj) {
+            layer.open({
+                type: 2,
+                title: '修改',
+                shade: 0.1,
+                area: ['550px', '500px'],
+                content: MODULE_PATH + "edit/"+ obj.data['placeId']
+            });
+        }
+        window.rqInfo = function (obj) {
+            layer.open({
+                type: 2,
+                title: '打卡二维码',
+                shade: 0.1,
+                area: ['550px', '500px'],
+                content: MODULE_PATH + "qrInfo/"+ obj.data['placeId']
+            });
+        }
+
+
+        window.remove = function (obj) {
+            layer.confirm('确定要删除该场所', {icon: 3, title: '提示'}, function (index) {
+                layer.close(index);
+                let loading = layer.load();
+                $.ajax({
+                    url: MODULE_PATH + "remove/" + obj.data['placeId'],
+                    dataType: 'json',
+                    type: 'delete',
+                    success: function (result) {
+                        layer.close(loading);
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                obj.del();
+                            });
+                        } else {
+                            popup.failure(result.msg);
+                        }
+                    }
+                })
+            });
+        }
+
+        window.batchRemove = function (obj) {
+            let ids = common.checkField(obj, 'placeId');
+            if (common.isEmpty(ids)) {
+                popup.warning("未选中数据");
+                return false;
+            }
+            layer.confirm('确定要删除选中场所', {icon: 3, title: '提示'}, function (index) {
+                layer.close(index);
+                let loading = layer.load();
+                $.ajax({
+                    url: MODULE_PATH + "batchRemove/" + ids,
+                    dataType: 'json',
+                    type: 'delete',
+                    success: function (result) {
+                        layer.close(loading);
+                        if (result.success) {
+                            popup.success(result.msg, function () {
+                                table.reload('user-table');
+                            })
+                        } else {
+                            popup.failure(result.msg);
+                        }
+                    }
+                })
+            });
+        }
+
+        window.refresh = function (param) {
+            table.reload('place-table', {where: param});
+        }
+    })
+</script>
+</html>
