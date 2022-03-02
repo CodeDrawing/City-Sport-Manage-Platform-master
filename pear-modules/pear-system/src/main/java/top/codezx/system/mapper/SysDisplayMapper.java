@@ -1,8 +1,13 @@
 package top.codezx.system.mapper;
 
-import org.mapstruct.Mapper;
+
+
+import org.apache.ibatis.annotations.Mapper;
+import top.codezx.system.domain.SysLog;
 
 import java.util.Date;
+import java.util.List;
+
 @Mapper
 public interface SysDisplayMapper {
     /**
@@ -13,5 +18,5 @@ public interface SysDisplayMapper {
      * @param startDate
      * @return
      */
-    int displayDataAboutLoginByDateAndPlace(Date endDate, Date startDate);
+    List<SysLog> displayDataAboutLoginByDate(String endDate, String startDate);
 }
