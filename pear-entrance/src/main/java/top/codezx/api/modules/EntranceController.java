@@ -126,7 +126,6 @@ public class EntranceController extends BaseController {
         String sLast5Day = dateFormat.format(last5Day);//格式化
         String sLast5DayStart=sLast5Day+" 00:00:00";//当天开始
         String sLast5DayEnd=sLast5Day+" 23:59:59";//当天结束
-
         /*
         7天前
          */

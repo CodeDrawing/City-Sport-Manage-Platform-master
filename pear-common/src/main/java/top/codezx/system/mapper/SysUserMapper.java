@@ -40,7 +40,7 @@ public interface SysUserMapper {
      * Param: username
      * Return: Integer
      */
-    Integer count(SysUser sysUser);
+     Integer count(SysUser sysUser);
 
     /**
      * Describe: 添加用户数据
