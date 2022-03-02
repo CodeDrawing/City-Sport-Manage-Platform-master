@@ -172,13 +172,34 @@
 
     </div>
 </div>
+<input type="hidden" id="todayData" th:value="${todayVisitData}">
+<input type="hidden" id="last1DayData" th:value="${last1DayData}">
+<input type="hidden" id="last2DayData" th:value="${last2DayData}">
+<input type="hidden" id="last3DayData" th:value="${last3DayData}">
+<input type="hidden" id="last4DayData" th:value="${last4DayData}">
+<input type="hidden" id="last5DayData" th:value="${last5DayData}">
 <th:block th:include="include :: footer"/>
 <script th:inline="javascript">
+
     layui.use(['layer', 'echarts', 'element', 'count', 'topBar'], function () {
         let count = layui.count,
             echarts = layui.echarts;
+        //得到日期
+        var myDate = new Date();
+        var today=myDate.toLocaleDateString();     //获取当前日期
+        var yesterday = new Date(myDate.getTime() - 24 * 60 * 60 * 1000).toLocaleDateString();    //获取前一天日期
+        var last2Day = new Date(myDate.getTime() - 24 * 60 * 60 * 1000*2).toLocaleDateString();    //获取前一天日期
+        var last3Day = new Date(myDate.getTime() - 24 * 60 * 60 * 1000*3).toLocaleDateString();    //获取前一天日期
+        var last4Day = new Date(myDate.getTime() - 24 * 60 * 60 * 1000*4).toLocaleDateString();    //获取前一天日期
+        var last5Day = new Date(myDate.getTime() - 24 * 60 * 60 * 1000*5).toLocaleDateString();    //获取前一天日期
 
-
+        //图表数据 6天之内的数据
+        var todayData=document.getElementById("todayData").value;
+        var last1DayData=document.getElementById("last1DayData").value;
+        var last2DayData=document.getElementById("last2DayData").value;
+        var last3DayData=document.getElementById("last3DayData").value;
+        var last4DayData=document.getElementById("last4DayData").value;
+        var last5DayData=document.getElementById("last5DayData").value;
 
         var echartsRecords = echarts.init(document.getElementById('echarts-records'), 'walden');
 
@@ -188,7 +209,7 @@
             },
             xAxis: [{
                 type: 'category',
-                data: ['2019-01', '2019-02', '2019-03', '2019-04', '2019-05', '2019-06'],
+                data: [last5Day, last4Day, last3Day, last2Day, yesterday, today],
                 axisLine: {
                     lineStyle: {
                         color: "#999"
@@ -220,7 +241,7 @@
             series: [{
                 name: '课时',
                 type: 'line',
-                data: [23, 60, 20, 36, 23, 85],
+                data: [last5DayData, last4DayData, last3DayData, last2DayData, last1DayData, todayData],
                 lineStyle: {
                     normal: {
                         width: 8,

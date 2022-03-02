@@ -87,31 +87,74 @@ public class EntranceController extends BaseController {
         String sCurrentDateEnd=sCurrentDate+" 23:59:59";//当天结束
 
         /*
+        一天前
+         */
+        ca.add(Calendar.DATE, -1); //七天前
+        Date last1Day = ca.getTime(); //结果
+        String sLast1Day = dateFormat.format(last1Day);//格式化
+        String sLast1DayStart=sLast1Day+" 00:00:00";//当天开始
+        String sLast1DayEnd=sLast1Day+" 23:59:59";//当天结束
+        /*
+        两天前
+         */
+        ca.add(Calendar.DATE, -1); //七天前
+        Date last2Day = ca.getTime(); //结果
+        String sLast2Day = dateFormat.format(last2Day);//格式化
+        String sLast2DayStart=sLast2Day+" 00:00:00";//当天开始
+        String sLast2DayEnd=sLast2Day+" 23:59:59";//当天结束
+        /*
+        三天前
+         */
+        ca.add(Calendar.DATE, -1); //七天前
+        Date last3Day = ca.getTime(); //结果
+        String sLast3Day = dateFormat.format(last3Day);//格式化
+        String sLast3DayStart=sLast3Day+" 00:00:00";//当天开始
+        String sLast3DayEnd=sLast3Day+" 23:59:59";//当天结束
+        /*
+        四天前
+         */
+        ca.add(Calendar.DATE, -1); //七天前
+        Date last4Day = ca.getTime(); //结果
+        String sLast4Day = dateFormat.format(last4Day);//格式化
+        String sLast4DayStart=sLast4Day+" 00:00:00";//当天开始
+        String sLast4DayEnd=sLast4Day+" 23:59:59";//当天结束
+        /*
+        五天前
+         */
+        ca.add(Calendar.DATE, -1); //七天前
+        Date last5Day = ca.getTime(); //结果
+        String sLast5Day = dateFormat.format(last5Day);//格式化
+        String sLast5DayStart=sLast5Day+" 00:00:00";//当天开始
+        String sLast5DayEnd=sLast5Day+" 23:59:59";//当天结束
+
+        /*
         7天前
          */
-        ca.add(Calendar.DATE, -7); //七天前
+        ca.add(Calendar.DATE, -2); //七天前
         Date last7Day = ca.getTime(); //结果
         String sLast7Day = dateFormat.format(last7Day);
         String sLast7DayStart=sLast7Day+" 00:00:00";
         String sLast7DayEnd=sLast7Day+" 23:59:59";
-        System.out.println(sLast7DayStart);
         /*
         一个月前
          */
-        ca.add(Calendar.MONTH, -1); //一个月前
-        Date last30Day = ca.getTime(); //结果
+        Calendar caMonth = Calendar.getInstance();//得到一个Calendar的实例
+        caMonth.add(Calendar.MONTH, -1); //一个月前
+        Date last30Day = caMonth.getTime(); //结果
         String sLast30Day = dateFormat.format(last30Day);
         String sLast30DayStart=sLast30Day+" 00:00:00";
         String sLast30DayEnd=sLast30Day+" 23:59:59";
         /*
         一年前
          */
-        ca.add(Calendar.YEAR, -1); //一个月前
-        Date lastYear = ca.getTime(); //结果
+        Calendar caYear = Calendar.getInstance();//得到一个Calendar的实例
+        caYear.add(Calendar.YEAR, -1); //一个月前
+        Date lastYear = caYear.getTime(); //结果
         String sLastYear = dateFormat.format(lastYear);
         String sLastYearStart=sLastYear+" 00:00:00";
         String sLastYearEnd=sLastYear+" 23:59:59";
 
+        //数据展示
         int todayVisitData = iSysDisplayService.displayDataAboutLoginByDate(sCurrentDateStart,sCurrentDateEnd);
         int day7VisitData = iSysDisplayService.displayDataAboutLoginByDate(sLast7DayStart,sCurrentDateEnd);
         int day30VisitData = iSysDisplayService.displayDataAboutLoginByDate(sLast30DayStart,sCurrentDateEnd);
@@ -120,6 +163,20 @@ public class EntranceController extends BaseController {
         model.addAttribute("day7VisitData",day7VisitData);
         model.addAttribute("day30VisitData",day30VisitData);
         model.addAttribute("lastYearVisitData",lastYearVisitData);
+
+        //图表数据
+        int last1DayData = iSysDisplayService.displayDataAboutLoginByDate(sLast1DayStart,sLast1DayEnd);
+        int last2DayData = iSysDisplayService.displayDataAboutLoginByDate(sLast2DayStart,sLast2DayEnd);
+        int last3DayData = iSysDisplayService.displayDataAboutLoginByDate(sLast3DayStart,sLast3DayEnd);
+        int last4DayData = iSysDisplayService.displayDataAboutLoginByDate(sLast4DayStart,sLast4DayEnd);
+        int last5DayData = iSysDisplayService.displayDataAboutLoginByDate(sLast5DayStart,sLast5DayEnd);
+        model.addAttribute("last1DayData",last1DayData);
+        model.addAttribute("last2DayData",last2DayData);
+        model.addAttribute("last3DayData",last3DayData);
+        model.addAttribute("last4DayData",last4DayData);
+        model.addAttribute("last5DayData",last5DayData);
+
+
 
         return jumpPage("console/console");
     }
