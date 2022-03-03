@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import top.codezx.system.domain.SysUser;
 import top.codezx.system.service.ISysDisplayService;
 
 import javax.annotation.Resource;
@@ -44,9 +45,11 @@ public class EntranceController extends BaseController {
      */
     @GetMapping("login")
     public ModelAndView login(HttpServletRequest request) {
+
         if (SecurityUtil.isAuthentication()) {
             SecureSessionService.expiredSession(request, sessionRegistry);
             return jumpPage("index");
+
         } else {
             return jumpPage("login");
         }
