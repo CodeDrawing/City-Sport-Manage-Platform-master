@@ -11,15 +11,26 @@
 <body>
 
 <input id="add" type="hidden" th:value="${qrInfo}" style="width:80%" /><br />
-<div class="layui-card">
 
-    <div class="layui-card-body">
-        <table id="qrcode" ></table>
+<div class="layui-row layui-col-space10">
+    <div class="layui-col-md12">
+        <div class="layui-card">
+            <div class="layui-card-body" >
+                <div  class="layui-tab custom-tab layui-tab-brief" lay-filter="docDemoTabBrief" style="text-align:center;align-items: center">
+                <span style="color:#36b368;font-size:21px;align-items: center;">
+                        打卡场馆：[[${placeName}]]
+                </span>
+                <div id="qrcode" style="background-color:#ffffff;height:300px;width: 300px;margin: 0 auto;margin-top:30px"></div>
+                </div>
+<!--                <table id="qrcode" ></table>-->
+            </div>
+        </div>
     </div>
-    <span class="pear-text">
-        [[${placeName}]]
-    </span>
+
 </div>
+
+
+
 
 
 <script type="text/javascript">
@@ -35,7 +46,6 @@
             return;
         }
 
-        // qrcode.makeCode('http://192.168.0.103:8081/system/place/toArrivalLogin/'+elText.value);
         qrcode.makeCode(elText.value);
     }
 

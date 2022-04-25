@@ -22,7 +22,6 @@ spring:
     # 是 否 检 查 流 程 定 义 文 件
     check-process-definitions: false
 
-
 # Pear 插 件 配 置 信 息
 pear:
 #  # Document 配 置 信 息
@@ -78,7 +77,7 @@ pear:
     # windows 上传路径
     windows-path: D:\home\uploads\
     # linux 上传路径
-    linux-path: /home/uploads/
+    linux-path: /Users/zx/Desktop/upload
     # 是否使用ftp服务器
     ftp-use: false
     #  ftp服务器地址

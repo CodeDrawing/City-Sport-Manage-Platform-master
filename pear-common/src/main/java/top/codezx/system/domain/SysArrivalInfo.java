@@ -19,7 +19,13 @@ public class SysArrivalInfo {
   Integer the31To60;
   Integer above61;
   Integer theNumberOfPeople;
-  Date date;
+  Date arrivalDate;
+  String arrivalDateNotStandard;
   String placeName;
   String placeId;
+  String arrivalUserInfoId;
+  //与arrivalInfo表对应
+  String userId;
+  String userName;
+  String realName;
 }

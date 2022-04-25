@@ -34,7 +34,10 @@
 
     <!-- 根据 SysUser 条件查询用户列表 -->
     <select id="selectList" resultMap="SysUserMap">
-        select * from sys_user su,sys_role sr,sys_user_role sur
+        select su.*,sr.role_id,sr.role_name,sr.role_code,sr.enable as enable1,sr.details,sr.sort
+        from sys_user su,
+             sys_role sr,
+             sys_user_role sur
         <where>
             sr.role_id=sur.role_id and su.user_id=sur.user_id
             <if test="username!=null and username!=''">

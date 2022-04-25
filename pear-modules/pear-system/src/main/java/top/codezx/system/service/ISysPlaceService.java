@@ -14,6 +14,11 @@ public interface ISysPlaceService {
 
     PageInfo<SysPlace> page(SysPlace param, PageDomain pageDomain);
 
+    /**
+     * 查询到场信息
+     */
+    PageInfo<SysArrivalInfo> selectArrivalUserInfo(SysArrivalInfo parma,PageDomain pageDomain);
+
     SysUser arrivalLogin(String username);
 
     SysArrivalInfo alreadyHaveTheDate(String date,String placeName);
@@ -34,6 +39,12 @@ public interface ISysPlaceService {
     boolean batchRemove(String[] ids);
 
     boolean updateById(SysPlace sysPlace);
+    /**
+     * 插入到场信息
+     */
+    boolean insertArrivalUserInfo(SysArrivalInfo sysArrivalInfo);
+
+
 
 
 }

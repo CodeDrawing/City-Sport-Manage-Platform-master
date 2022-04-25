@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:include="include :: header('用户列表')"/>
+    <th:block th:include="include :: header('场馆列表')"/>
     <link rel="stylesheet" th:href="@{/admin/css/other/user.css}"/>
 </head>
 <body class="pear-container">
@@ -9,7 +9,6 @@
     <div class="layui-card-body">
         <form action="" class="layui-form" lay-filter="user-query-form">
             <div class="layui-form-item">
-
                 <label class="layui-form-label">场所名称</label>
                 <div class="layui-input-inline">
                     <input class="layui-input" name="placeName" placeholder="" type="text">
@@ -74,7 +73,6 @@
         let table = layui.table;
         let form = layui.form;
         let $ = layui.jquery;
-        let dtree = layui.dtree;
         let popup = layui.popup;
         let common = layui.common;
 

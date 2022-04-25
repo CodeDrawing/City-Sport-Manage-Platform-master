@@ -27,11 +27,13 @@ import top.codezx.system.domain.SysPlace;
 
 import top.codezx.system.domain.SysUser;
 import top.codezx.system.service.ISysConfigService;
+import top.codezx.system.service.ISysDisplayService;
 import top.codezx.system.service.ISysPlaceService;
 import top.codezx.system.service.ISysUserService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -52,6 +54,8 @@ public class SysPlaceController extends BaseController {
     private ISysUserService iSysUserService;
     @Resource
     private ISysConfigService iSysConfigService;
+    @Resource
+    private ISysDisplayService iSysDisplayService;
 
 
     /**
@@ -86,8 +90,7 @@ public class SysPlaceController extends BaseController {
      * Return 成功或者失败页面
      */
     @RequestMapping("arrivalLogin")
-//    @ApiOperation(value = "打卡登陆")
-//    @PreAuthorize("hasPermission('/system/place/toArrivalLogin','sys:place:toArrivalLogin')")
+
     public Result arrivalLogin(@RequestParam("username")String username,
                                @RequestParam("password")String password,
                                @RequestParam("placeName")String placeName,
@@ -95,21 +98,19 @@ public class SysPlaceController extends BaseController {
 //          根据username查询出该用户的密码，然后得 到用户信息，返回到这层
         SysUser sysUser = iSysPlaceService.arrivalLogin(username);
 //        根据BCryptPasswordEncoder类中的matches方法对密码进行判断，因为数据库中的密码是加密了的，所以要这样进行判断
-
         boolean result = new BCryptPasswordEncoder().matches(password, sysUser.getPassword());
         if(result==true){
             //把时间格式设置为年月日的规范型
-            //把时间格式设置为年月日的规范型
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-//            判断数据库中有没有该场馆今日的到场信息，如果有，就直接添加，否则就插入再添加
+            // 判断数据库中有没有该场馆今日的到场信息，如果有，就直接添加，否则就插入再添加
             SysArrivalInfo arrivalInfo = iSysPlaceService.alreadyHaveTheDate(sdf.format(new Date()),placeName);
-      //            已经有了？那就根据生日得到年龄
+            //已经有了？那就根据生日得到年龄
             if(arrivalInfo==null){
                 SysArrivalInfo sysArrivalInfo = new SysArrivalInfo();
                 sysArrivalInfo.setArrivalInfoId(SequenceUtil.makeStringId());
                 sysArrivalInfo.setPlaceName(placeName);
                 sysArrivalInfo.setPlaceId(placeId);
-                sysArrivalInfo.setDate(new Date());
+                sysArrivalInfo.setArrivalDate(new Date());
                 iSysPlaceService.insertArrivalInfo(sysArrivalInfo);
             }
             /**
@@ -121,7 +122,6 @@ public class SysPlaceController extends BaseController {
             long days = DateTimeUtil.getYear(new Date(),sysUser.getBirthday());
             //days除365表示多少岁（大概）
             long year=days/365;
-            System.out.println(year);
             //分别判断小于18，小于30，小于60，和60以上的用户
             if(year<18){
                 iSysPlaceService.updateUnder18(arrivalInfo);
@@ -135,11 +135,16 @@ public class SysPlaceController extends BaseController {
             /**
              * 对性别分类
              */
-            if(sysUser.getSex()=="0"){
+            if(sysUser.getSex().equals("0")){
                 iSysPlaceService.updateManNumber(arrivalInfo);
             }else{
                 iSysPlaceService.updateWomanNumber(arrivalInfo);
             }
+            SysArrivalInfo sysArrivalInfo = new SysArrivalInfo();
+            sysArrivalInfo.setArrivalInfoId(arrivalInfo.getArrivalInfoId());
+            sysArrivalInfo.setUserId(sysUser.getUserId());
+            sysArrivalInfo.setArrivalUserInfoId(SequenceUtil.makeStringId());
+            iSysPlaceService.insertArrivalUserInfo(sysArrivalInfo);
         }
         return decide(result);
     }
@@ -152,6 +157,7 @@ public class SysPlaceController extends BaseController {
     @RequestMapping("/to/success")
     @Logging(title = "打卡成功", describe = "打卡成功", type = BusinessType.QUERY)
     public ModelAndView toSuccess(){
+
         return jumpPage(MODULE_PATH + "success");
     }
     /**
@@ -163,7 +169,6 @@ public class SysPlaceController extends BaseController {
     public ModelAndView toFail(){
         return jumpPage(MODULE_PATH + "fail");
     }
-
 
 
     /**
@@ -189,6 +194,23 @@ public class SysPlaceController extends BaseController {
     @PreAuthorize("hasPermission('/system/place/qrInfo','sys:place:qrInfo')")
     @Logging(title = "生成二维码", describe = "生成二维码", type = BusinessType.QUERY)
     public ModelAndView qrInfo(Model model,@PathVariable("placeId") String placeId) {
+        SysPlace sysPlace = iSysPlaceService.selectById(placeId);
+        model.addAttribute("qrInfo",sysPlace.getQRInfo());
+        model.addAttribute("placeName",sysPlace.getPlaceName());
+        return jumpPage(MODULE_PATH+"placeQR");
+    }
+    /**
+     * Describe: 生成二维码
+     * Param ModelAndView
+     * Return 跳转到生成二维码页面
+     */
+    @GetMapping("MqrInfo")
+    @ApiOperation(value = "生成管理场所的二维码")
+    @PreAuthorize("hasPermission('/system/place/MqrInfo','sys:place:MqrInfo')")
+    @Logging(title = "生成二维码", describe = "生成二维码", type = BusinessType.QUERY)
+    public ModelAndView qrInfo(Model model) {
+        SysUser sysUser = SecurityUtil.currentUser();
+        String placeId = iSysDisplayService.queryPlaceIdByUserid(sysUser.getUserId());
         SysPlace sysPlace = iSysPlaceService.selectById(placeId);
         model.addAttribute("qrInfo",sysPlace.getQRInfo());
         model.addAttribute("placeName",sysPlace.getPlaceName());
@@ -240,11 +262,12 @@ public class SysPlaceController extends BaseController {
     @ApiOperation(value = "获取场所修改视图")
     @PreAuthorize("hasPermission('/system/place/edit','sys:place:edit')")
     public ModelAndView edit(Model model,@PathVariable("id") String placeId){
-        System.out.println(placeId);
+        System.out.println("========");
+        System.err.println(placeId);
         List<SysUser> list = iSysUserService.list(null);
         model.addAttribute("users",list);
         model.addAttribute("sysPlace",iSysPlaceService.selectById(placeId));
-        System.out.println(iSysPlaceService.selectById(placeId));
+
         return jumpPage(MODULE_PATH+"edit");
     }
 
@@ -258,11 +281,34 @@ public class SysPlaceController extends BaseController {
     @PreAuthorize("hasPermission('/system/place/edit','sys:place:edit')")
     @Logging(title = "修改场馆", describe = "修改场馆", type = BusinessType.EDIT)
     public Result update(@RequestBody SysPlace sysPlace) {
-        System.out.println(sysPlace);
         boolean result = iSysPlaceService.updateById(sysPlace);
         return decide(result);
     }
-
-
-
+    /**
+     * Describe: 获取场所列表视图
+     * Param ModelAndView
+     * Return 场所列表视图
+     */
+    @GetMapping("toArriveUsersInfo")
+    @ApiOperation(value = "获取场所列表视图")
+    @PreAuthorize("hasPermission('/system/place/toArriveUsersInfo','sys:place:toArriveUsersInfo')")
+    public ModelAndView toArriveUsersInfoList() {
+        return jumpPage(MODULE_PATH + "arrivalUserInfo");
+    }
+    /**
+     * Describe: 到场信息查询
+     * Param PageDomain
+     * Return 返回到场信息查询
+     */
+    @GetMapping("arriveUsersInfo")
+    @ApiOperation(value = "查询到场用户信息")
+    @PreAuthorize("hasPermission('/system/place/arriveUsersInfo','sys:place:arriveUsersInfo')")
+    @Logging(title = "查询到场用户信息", describe = "查询到场用户信息", type = BusinessType.QUERY)
+    public ResultTable showArriveUsersInfoList(PageDomain pageDomain,SysArrivalInfo parma,String notStandardDate){
+        parma.setArrivalDateNotStandard(notStandardDate);
+        SysUser sysUser = SecurityUtil.currentUser();
+        parma.setUserId(sysUser.getUserId());
+        PageInfo<SysArrivalInfo> pageInfo = iSysPlaceService.selectArrivalUserInfo(parma, pageDomain);
+        return pageTable(pageInfo.getList(), pageInfo.getTotal());
+    }
 }

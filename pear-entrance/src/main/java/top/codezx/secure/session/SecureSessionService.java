@@ -16,11 +16,9 @@ import java.util.List;
  * CreateTime: 2019/10/23
  */
 public class SecureSessionService {
+
     public static void expiredSession(HttpServletRequest request, SessionRegistry sessionRegistry) {
         SysUser currentUser = (SysUser) request.getSession().getAttribute("currentUser");
-        System.out.println("+++++++++++++++");
-        System.out.println(currentUser);
-        System.out.println("+++++++++++++++");
         String sessionId = request.getSession().getId();
         // 从sessionRegistry中获取所有的用户信息
         List<Object> principals = sessionRegistry.getAllPrincipals();

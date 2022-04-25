@@ -6,7 +6,6 @@ import top.codezx.system.domain.SysArrivalInfo;
 import top.codezx.system.domain.SysPlace;
 import top.codezx.system.domain.SysUser;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -18,6 +17,10 @@ public interface SysPlaceMapper {
      * @return 场馆列表
      */
     List<SysPlace> selectList(SysPlace param);
+    /**
+     * 查询到场信息
+     */
+    List<SysArrivalInfo> selectArrivalUserInfo(SysArrivalInfo parma);
 
     /**
      * 根据用户名来获取用户信息
@@ -26,7 +29,7 @@ public interface SysPlaceMapper {
      */
     SysUser arrivalLogin(String username);
 
-    SysArrivalInfo alreadyHaveTheDate(String date,String placeName);
+    SysArrivalInfo alreadyHaveTheDate(String arrivalDate,String placeName);
 //    数据库中没有今天该场所的信息，那么就使用这个方法进行添加记录
     int insertArrivalInfo(SysArrivalInfo sysArrivalInfo);
 
@@ -54,5 +57,10 @@ public interface SysPlaceMapper {
     boolean deleteByIds(String[] ids);
 
     boolean updateById(SysPlace sysPlace);
+    /**
+     * 插入到场信息
+     */
+    boolean insertArrivalUserInfo(SysArrivalInfo sysArrivalInfo);
+
 
 }

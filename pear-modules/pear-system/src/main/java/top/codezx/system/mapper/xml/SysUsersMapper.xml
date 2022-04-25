@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="top.codezx.system.mapper.SysUsersMapper">
+
+<select id="showUserArrivalDataByRangeData" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select count(*)
+    from sys_arrivalInfo sai,
+         sys_arrivalUserInfo saui,
+         sys_placeInfo spi
+    where sai.arrival_info_id=saui.arrival_info_id
+      and spi.place_id=sai.place_id
+      and user_id=#{userId}
+      and  arrivalDate between #{startDate} and #{endDate}
+</select>
+    <select id="showTop5ArrivalByUserId" parameterType="java.lang.String" resultType="top.codezx.system.domain.SysUsers">
+        select count(*) as count,sp.place_name
+        from sys_placeInfo sp,
+            sys_arrivalInfo sai,
+            sys_arrivalUserInfo saui,
+            sys_user su
+        where su.user_id = saui.user_id
+          and sai.arrival_info_id=saui.arrival_info_id
+          and sai.place_id=sp.place_id
+          and su.user_id=#{userId}
+        group by sp.place_name
+        order by count
+            limit 4
+    </select>
+    <select id="showMostSportProject" parameterType="java.lang.String" resultType="top.codezx.system.domain.SysUsers">
+        select count(*) as count,sp.sport_project
+        from sys_placeInfo sp,
+            sys_arrivalInfo sai,
+            sys_arrivalUserInfo saui,
+            sys_user su
+        where su.user_id = saui.user_id
+          and sai.arrival_info_id=saui.arrival_info_id
+          and sai.place_id=sp.place_id
+          and su.user_id=#{userId}
+        group by sp.sport_project
+        order by count
+            limit 5
+    </select>
+    <select id="showSportRecord" parameterType="java.lang.String" resultType="top.codezx.system.domain.SysUsers">
+        select sp.place_name,sai.arrivalDate,sp.sport_project
+        from sys_placeInfo sp,sys_arrivalInfo sai,sys_arrivalUserInfo saui,sys_user su
+        where su.user_id = saui.user_id
+          and sai.arrival_info_id=saui.arrival_info_id
+          and sai.place_id=sp.place_id
+          and su.user_id=#{userId}
+            order by sai.arrivalDate desc
+            <if test="limit!=null and limit!=''">
+                limit #{limit}
+            </if>
+    </select>
+
+
+</mapper>

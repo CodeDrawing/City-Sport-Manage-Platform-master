@@ -2,8 +2,117 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="top.codezx.system.mapper.SysDisplayMapper">
 
-    <select id="displayDataAboutLoginByDate" parameterType="java.lang.String" resultType="top.codezx.system.domain.SysLog">
-        select * from sys_logging where title='打卡成功' and create_time between #{endDate} and #{startDate}
+<!--    <select id="displayDataAboutLoginByDate" parameterType="java.lang.String" resultType="top.codezx.system.domain.SysLog">-->
+<!--        select * from sys_logging where title='打卡成功' and create_time between #{endDate} and #{startDate}-->
+<!--    </select>-->
+
+
+    <select id="displayDataAboutLoginByDate" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select sum(the_number_of_man+the_number_of_woman) from sys_arrivalinfo where  arrivalDate between #{endDate} and #{startDate}
     </select>
+
+    <select id="displayDataAboutVisitByDateAndPlaceId" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select sum(the_number_of_man+the_number_of_woman) from sys_arrivalInfo where place_id=#{placeId} and arrivalDate between #{endDate} and #{startDate}
+    </select>
+    <select id="queryPlaceIdByUserid" parameterType="java.lang.String" resultType="java.lang.String">
+        select place_id from sys_placeInfo where manager_id=#{userId}
+    </select>
+    <select id="showTopFiveData" resultType="top.codezx.system.domain.SysArrivalInfo">
+        select arrivalDate,the_number_of_man,the_number_of_woman from sys_arrivalInfo where place_id=#{placeId}
+        ORDER BY arrivalDate desc LIMIT 5
+    </select>
+    <select id="showUnder18Data" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select sum(under18) from sys_arrivalInfo where place_id=#{placeId}
+    </select>
+    <select id="show18TO30Data" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select sum(the18To30) from sys_arrivalInfo where place_id=#{placeId}
+    </select>
+    <select id="show31To60Data" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select sum(the31To60) from sys_arrivalInfo where place_id=#{placeId}
+    </select>
+    <select id="showAbove61Data" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select sum(above61) from sys_arrivalInfo where place_id=#{placeId}
+    </select>
+    <select id="showAllUnder18Data" resultType="java.lang.Integer">
+        select sum(under18) from sys_arrivalInfo
+    </select>
+    <select id="showAll18TO30Data" resultType="java.lang.Integer">
+        select sum(the18To30) from sys_arrivalInfo
+    </select>
+    <select id="showAll31To60Data" resultType="java.lang.Integer">
+        select sum(the31To60) from sys_arrivalInfo
+    </select>
+    <select id="showAllAbove61Data" resultType="java.lang.Integer">
+        select sum(above61) from sys_arrivalInfo
+    </select>
+    
+    <insert id="insertData" parameterType="top.codezx.system.domain.SysArrivalInfo">
+        insert into sys_arrivalInfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="placeId != null">
+                place_id,
+            </if>
+            <if test="arrivalInfoId != null">
+                arrival_info_id,
+            </if>
+            <if test="arrivalDate != null">
+                arrivalDate,
+            </if>
+            <if test="placeName != null">
+                place_name,
+            </if>
+            <if test="the18To30 != null">
+                the18To30,
+            </if>
+            <if test="the31To60 != null">
+                the31To60,
+            </if>
+            <if test="theNumberOfMan != null">
+                the_number_of_man,
+            </if>
+            <if test="under18 != null">
+                under18,
+            </if>
+            <if test="theNumberOfWoman != null">
+                the_number_of_woman,
+            </if>
+            <if test="above61 != null">
+                above61,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="placeId != null">
+                #{placeId},
+            </if>
+            <if test="arrivalInfoId != null">
+                #{arrivalInfoId},
+            </if>
+            <if test="arrivalDate != null">
+                #{arrivalDate},
+            </if>
+            <if test="placeName != null">
+                #{placeName},
+            </if>
+            <if test="the18To30 != null">
+                #{the18To30},
+            </if>
+            <if test="the31To60 != null">
+                #{the31To60},
+            </if>
+            <if test="theNumberOfMan != null">
+                #{theNumberOfMan},
+            </if>
+            <if test="under18 != null">
+                #{under18},
+            </if>
+            <if test="theNumberOfWoman != null">
+                #{theNumberOfWoman},
+            </if>
+            <if test="above61 != null">
+                #{above61},
+            </if>
+        </trim>
+    </insert>
+
 
 </mapper>

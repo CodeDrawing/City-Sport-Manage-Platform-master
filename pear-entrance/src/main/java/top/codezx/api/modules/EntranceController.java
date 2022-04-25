@@ -1,6 +1,8 @@
 package top.codezx.api.modules;
 
 
+import io.swagger.annotations.ApiOperation;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import top.codezx.common.plugin.logging.aop.annotation.Logging;
 import top.codezx.common.plugin.logging.aop.enums.BusinessType;
@@ -28,7 +30,9 @@ import java.util.Date;
  * Author: 就 眠 仪 式
  * CreateTime: 2019/10/23
  */
-@RestController
+//@Controller 就是@Controller
+//@RestController 包括@Controller和@ResponseBody
+@Controller
 @RequestMapping
 @Api(tags = {"项目入口"})
 public class EntranceController extends BaseController {
@@ -45,19 +49,13 @@ public class EntranceController extends BaseController {
      */
     @GetMapping("login")
     public ModelAndView login(HttpServletRequest request) {
-
         if (SecurityUtil.isAuthentication()) {
             SecureSessionService.expiredSession(request, sessionRegistry);
             return jumpPage("index");
-
         } else {
             return jumpPage("login");
         }
     }
-
-
-
-
 
     /**
      * Describe: 获取主页视图
@@ -77,6 +75,9 @@ public class EntranceController extends BaseController {
      */
     @GetMapping("console")
     public ModelAndView home(Model model) {
+        SysUser sysUser = SecurityUtil.currentUser();
+        if(sysUser.getDeptId()!="1501811731045810176"){
+
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         Calendar ca = Calendar.getInstance();//得到一个Calendar的实例
@@ -178,9 +179,22 @@ public class EntranceController extends BaseController {
         model.addAttribute("last4DayData",last4DayData);
         model.addAttribute("last5DayData",last5DayData);
 
+        //右侧男女比例
+        Integer under18 = iSysDisplayService.showAllUnder18Data();
+        Integer the18To30 = iSysDisplayService.showAll18TO30Data();
+        Integer the31To60 = iSysDisplayService.showAll31To60Data();
+        Integer above61 = iSysDisplayService.showAllAbove61Data();
+        model.addAttribute("under18",under18);
+        model.addAttribute("the18To30",the18To30);
+        model.addAttribute("the31To60",the31To60);
+        model.addAttribute("above61",above61);
 
 
         return jumpPage("console/console");
+
+        }else{
+            return jumpPage("error/403");
+        }
     }
 
     /**
@@ -210,4 +224,10 @@ public class EntranceController extends BaseController {
         return jumpPage("error/500");
     }
 
+    @RequestMapping("productData")
+    @ApiOperation(value = "获取场所列表视图")
+    public String productData(){
+        iSysDisplayService.insertData();
+        return "redirect:/console";
+    }
 }

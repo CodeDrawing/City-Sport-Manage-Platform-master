@@ -16,50 +16,79 @@
     </resultMap>
 
     <select id="selectList" resultMap="SysPlaceMap">
-        select * from sys_placeInfo sp,sys_user su,sys_dept sd
-        where sp.manager_id=su.user_id and sp.dept_id=sd.dept_id
+        select sp.place_name,sp.create_date,su.real_name,sp.notice,sp.sport_project,sd.dept_name,sp.QRInfo,sp.place_id
+        from sys_placeInfo sp,
+             sys_user su,
+             sys_dept sd
+        where sp.manager_id = su.user_id
+          and sp.dept_id = sd.dept_id
+        <if test="placeName!=null and placeName!=''">
+            and sp.place_name like "%"#{placeName}"%"
+        </if>
     </select>
 
     <select id="arrivalLogin" parameterType="java.lang.String" resultType="top.codezx.system.domain.SysUser">
-        select * from sys_user
-        where username=#{username}
+        select *
+        from sys_user
+        where username = #{username}
     </select>
 
-    <select id="alreadyHaveTheDate" parameterType="java.lang.String" resultType="top.codezx.system.domain.SysArrivalInfo">
-        select * from sys_arrivalInfo
-        where date=#{date} and place_name=#{placeName}
+    <select id="alreadyHaveTheDate" parameterType="java.lang.String"
+            resultType="top.codezx.system.domain.SysArrivalInfo">
+        select *
+        from sys_arrivalInfo
+        where arrivalDate =#{arrivalDate}
+          and place_name=#{placeName}
     </select>
-    <insert id="insertArrivalInfo" parameterType="top.codezx.system.domain.SysArrivalInfo" >
-        insert into sys_arrivalInfo (date,place_name,arrival_info_id,place_id) values (#{date},#{placeName},#{arrivalInfoId},#{placeId})
+    <insert id="insertArrivalInfo" parameterType="top.codezx.system.domain.SysArrivalInfo">
+        insert into sys_arrivalInfo (arrivalDate, place_name, arrival_info_id, place_id)
+        values (#{arrivalDate}, #{placeName}, #{arrivalInfoId}, #{placeId})
     </insert>
 
     <update id="updateUnder18" parameterType="top.codezx.system.domain.SysArrivalInfo">
-        update sys_arrivalInfo set under18=#{under18}+1
-        where date=#{date} and place_name=#{placeName}
+        update sys_arrivalInfo
+        set under18=#{under18} + 1
+        where arrivalDate =#{arrivalDate}
+          and place_name=#{placeName}
     </update>
     <update id="updateUnder18To30" parameterType="top.codezx.system.domain.SysArrivalInfo">
-        update sys_arrivalInfo set the18To30=#{the18To30}+1
-        where date=#{date} and place_name=#{placeName}
+        update sys_arrivalInfo
+        set the18To30=#{the18To30} + 1
+        where arrivalDate =#{arrivalDate}
+          and place_name=#{placeName}
     </update>
     <update id="updateUnder31To60" parameterType="top.codezx.system.domain.SysArrivalInfo">
-        update sys_arrivalInfo set the31To60=#{the31To60}+1
-        where date=#{date} and place_name=#{placeName}
+        update sys_arrivalInfo
+        set the31To60=#{the31To60} + 1
+        where arrivalDate =#{arrivalDate}
+          and place_name=#{placeName}
     </update>
     <update id="updateAbove61" parameterType="top.codezx.system.domain.SysArrivalInfo">
-        update sys_arrivalInfo set above61=#{above61}+1
-        where date=#{date} and place_name=#{placeName}
+        update sys_arrivalInfo
+        set above61=#{above61} + 1
+        where arrivalDate =#{arrivalDate}
+          and place_name=#{placeName}
     </update>
     <update id="updateManNumber" parameterType="top.codezx.system.domain.SysArrivalInfo">
-        update sys_arrivalInfo set the_number_of_man=#{theNumberOfMan}+1
-        where date=#{date} and place_name=#{placeName}
+        update sys_arrivalInfo
+        set the_number_of_man=#{theNumberOfMan} + 1
+        where arrivalDate =#{arrivalDate}
+          and place_name=#{placeName}
     </update>
     <update id="updateWomanNumber" parameterType="top.codezx.system.domain.SysArrivalInfo">
-        update sys_arrivalInfo set the_number_of_woman=#{theNumberOfWoman}+1
-        where date=#{date} and place_name=#{placeName}
+        update sys_arrivalInfo
+        set the_number_of_woman=#{theNumberOfWoman} + 1
+        where arrivalDate =#{arrivalDate}
+          and place_name=#{placeName}
     </update>
     <select id="selectById" parameterType="java.lang.String" resultType="top.codezx.system.domain.SysPlace">
-        select * from sys_placeInfo sp,sys_user su,sys_dept sd
-        where sp.manager_id=su.user_id and sp.dept_id=sd.dept_id and place_id=#{placeId}
+        select *
+        from sys_placeInfo sp,
+             sys_user su,
+             sys_dept sd
+        where sp.manager_id = su.user_id
+          and sp.dept_id = sd.dept_id
+          and place_id = #{placeId}
     </select>
     <insert id="insert" parameterType="SysPlace">
         insert into sys_placeInfo
@@ -118,12 +147,13 @@
         </trim>
     </insert>
     <delete id="deleteById" parameterType="java.lang.String">
-        delete from sys_placeInfo
-        where place_id=#{placeId}
+        delete
+        from sys_placeInfo
+        where place_id = #{placeId}
     </delete>
     <delete id="deleteByIds" parameterType="java.lang.String">
         delete from sys_placeInfo where place_id in
-        <foreach collection="array" item = "id" open="(" separator="," close=")">
+        <foreach collection="array" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
@@ -137,8 +167,8 @@
             <if test="sportProject">
                 sport_project = #{sportProject},
             </if>
-            <if test="userId">
-                manager_id = #{userId},
+            <if test="managerId">
+                manager_id = #{managerId},
             </if>
             <if test="notice">
                 notice = #{notice},
@@ -150,6 +180,47 @@
         </set>
         where place_id = #{placeId}
     </update>
+    <insert id="insertArrivalUserInfo" parameterType="top.codezx.system.domain.SysArrivalInfo">
+        insert into sys_arrivalUserInfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="arrivalUserInfoId!=null">
+                arrival_user_info_id,
+            </if>
+            <if test="arrivalInfoId!=null">
+                arrival_info_id,
+            </if>
+            <if test="userId!=null">
+                user_id,
+            </if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            <if test="arrivalUserInfoId!=null">
+                #{arrivalUserInfoId},
+            </if>
+            <if test="arrivalInfoId!=null">
+                #{arrivalInfoId},
+            </if>
+            <if test="userId!=null">
+                #{userId},
+            </if>
+        </trim>
+    </insert>
 
-    
+    <select id="selectArrivalUserInfo" parameterType="top.codezx.system.domain.SysArrivalInfo" resultType="top.codezx.system.domain.SysArrivalInfo">
+        select sai.arrivalDate,su.real_name,spi.place_name
+        from sys_placeInfo spi,
+             sys_arrivalInfo sai,
+             sys_arrivalUserInfo saui,
+             sys_user su
+        where spi.place_id=sai.place_id
+          and sai.arrival_info_id=saui.arrival_info_id
+          and saui.user_id=su.user_id
+          and spi.place_id=#{placeId}
+        <if test="realName!=null and realName!=''">
+            and su.real_name like "%"#{realName}"%"
+        </if>
+        <if test="arrivalDateNotStandard!=null and arrivalDateNotStandard!=''">
+            and sai.arrivalDate=#{arrivalDateNotStandard}
+        </if>
+    </select>
 </mapper>
